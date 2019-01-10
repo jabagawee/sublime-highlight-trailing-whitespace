@@ -6,6 +6,7 @@ import json
 
 NAMESPACE = 'HighlightTrailingWhitespace'
 DEFAULT_COLOR_SCHEME = 'Monokai.sublime-color-scheme'
+# TODO: look into changing this to \s instead
 WHITESPACE_PATTERN = '[\t ]+$'
 
 settings = None
@@ -62,10 +63,12 @@ def highlight_whitespace(view):
 				selection = view.sel()[0]
 				for region in regions:
 					if region.contains(selection):
+						# TODO: fix editing list while iterating on it
 						regions.remove(region)
 						break
 
 			# determine if we should fill the region or just draw an outline
+			# TODO: make this more understandable for its intentions
 			draw_flag = sublime.DRAW_NO_FILL
 			if settings.get('fill'):
 				draw_flag = 0

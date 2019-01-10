@@ -53,37 +53,41 @@ def highlight_whitespace(view):
 		# don't render in widget views
 		return
 
-	if settings.get('enabled'):
-		regions = view.find_all(WHITESPACE_PATTERN)
-		if regions:
-			# whitespace was found, time to shine!
-			if settings.get('never_on_cursor'):
-				# check if the cursor is on one of the matched regions and remove it from the list
-				selection = view.sel()[0]
-				for region in regions:
-					if region.contains(selection):
-						regions.remove(region)
-						break
-
-			# determine if we should fill the region or just draw an outline
-			draw_flag = sublime.DRAW_NO_FILL
-			if settings.get('fill'):
-				draw_flag = 0
-
-			# draw on the region(s)
-			view.add_regions(
-				NAMESPACE,
-				regions,
-				NAMESPACE,
-				'',
-				sublime.DRAW_EMPTY | sublime.HIDE_ON_MINIMAP | draw_flag
-			)
-		else:
-			# no whitespace, clear out
-			view.erase_regions(NAMESPACE)
-	else:
+	if not settings.get('enabled'):
 		# we're disabled, clean up
 		view.erase_regions(NAMESPACE)
+		return
+	
+	regions = view.find_all(WHITESPACE_PATTERN)
+	
+	if not regions:
+		# no whitespace, clear out
+		view.erase_regions(NAMESPACE)
+		return
+		
+	# whitespace was found, time to shine!
+	if settings.get('never_on_cursor'):
+		# check if the cursor is on one of the matched regions and remove it from the list
+		selection = view.sel()[0]
+		for region in regions:
+			if region.contains(selection):
+				regions.remove(region)
+				break
+
+	# determine if we should fill the region or just draw an outline
+	draw_flag = sublime.DRAW_NO_FILL
+	if settings.get('fill'):
+		draw_flag = 0
+
+	# draw on the region(s)
+	view.add_regions(
+		NAMESPACE,
+		regions,
+		NAMESPACE,
+		'',
+		sublime.DRAW_EMPTY | sublime.HIDE_ON_MINIMAP | draw_flag
+	)
+		
 
 def update_color_scheme():
 	'''
